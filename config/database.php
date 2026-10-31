@@ -1,10 +1,10 @@
 <?php
 function getConnection()
 {
-    $host = '127.0.0.1:3307';
-    $dbname = 'api_rs';
+    $host = '127.0.0.1:3306';
+    $dbname = 'simrs_mobile';
     $user = 'root';
-    $pass = '1986';
+    $pass = '';
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
