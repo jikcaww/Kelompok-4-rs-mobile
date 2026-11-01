@@ -1,7 +1,7 @@
 import makeListScreen from '../components/makeListScreen';
 import makeFormScreen from '../components/makeFormScreen';
 import {
-  dokterApi, pasienApi, pendaftaranApi, rekamMedisApi, resepApi,usersApi,
+  dokterApi, poliApi, pasienApi, pendaftaranApi, jadwalPraktikApi, rekamMedisApi, resepApi, usersApi,
 } from '../services/apis';
 import { exactDigits, isDate, positiveInt } from '../utils/validators';
 import { showAlert } from '../utils/dialog';
@@ -14,6 +14,35 @@ const dokterOptions = async () =>
 const pendaftaranOptions = async () =>
   (await pendaftaranApi.list()).map((p) => ({
     value: p.id, label: `#${p.id} antrian ${p.no_antrian} (${p.tanggal_kunjungan})`,
+  }));
+const jadwalOptions = async () =>
+  (await jadwalPraktikApi.list()).map((j) => ({
+    value: j.id,
+    label: `${j.nama_poli || `Poli #${j.poli_id}`} - ${j.nama_dokter || `Dokter #${j.dokter_id}`} - ${j.hari || '-'}`,
+  }));
+const poliOptions = async () =>
+  (await poliApi.list()).map((p) => ({ value: p.id, label: p.nama_poli }));
+
+// ---------- JADWAL PRAKTIK ----------
+export const JadwalPraktikList = makeListScreen({
+  api: jadwalPraktikApi, formRoute: 'JadwalPraktikForm',
+  titleOf: (j) => `${j.nama_poli || `Poli #${j.poli_id}`} - ${j.hari}`,
+  subOf: (j) => `${j.nama_dokter || `Dokter #${j.dokter_id}`} | ${j.jam_mulai || '-'}-${j.jam_selesai || '-'} | Kuota: ${j.kuota || 20}`,
+});
+export const JadwalPraktikForm = makeFormScreen({
+  api: jadwalPraktikApi,
+  fields: [
+    { name: 'dokter_id', label: 'Dokter', type: 'select', required: true, loadOptions: dokterOptions },
+    { name: 'poli_id', label: 'Poli', type: 'select', required: true, loadOptions: poliOptions },
+    { name: 'hari', label: 'Hari', required: true, placeholder: 'Contoh: Senin' },
+    { name: 'jam_mulai', label: 'Jam Mulai', required: true, placeholder: '08:00' },
+    { name: 'jam_selesai', label: 'Jam Selesai', required: true, placeholder: '12:00' },
+    { name: 'kuota', label: 'Kuota', type: 'number', required: true, default: '20', validate: [positiveInt('Kuota')] },
+  ],
+});
+const userOptions = async () =>
+  (await usersApi.list()).map((u) => ({
+    value: u.id, label: `${u.nama} - ${u.email} (ID: ${u.id})`,
   }));
 
 // ---------- DOKTER ----------
@@ -40,7 +69,10 @@ export const PasienList = makeListScreen({
 export const PasienForm = makeFormScreen({
   api: pasienApi,
   fields: [
-    { name: 'user_id', label: 'ID User (akun login)', type: 'number', required: true, validate: [positiveInt('ID User')] },
+    {
+      name: 'user_id', label: 'Akun User (wajib sudah ada)', type: 'select', required: true,
+      loadOptions: userOptions,
+    },
     { name: 'nik', label: 'NIK', type: 'number', required: true, maxLength: 16, validate: [exactDigits('NIK', 16)] },
     { name: 'no_rm', label: 'No. Rekam Medis', required: true, maxLength: 20 },
     { name: 'nama', label: 'Nama Lengkap', required: true, maxLength: 100 },
@@ -59,7 +91,7 @@ const STATUS_COLOR = { dipanggil: '#2563eb', selesai: '#16a34a', batal: '#6b7280
 export const PendaftaranList = makeListScreen({
   api: pendaftaranApi, formRoute: 'PendaftaranForm',
   titleOf: (p) => `Antrian ${p.no_antrian} - ${p.tanggal_kunjungan}`,
-  subOf: (p) => `Pasien #${p.pasien_id} | Jadwal #${p.jadwal_id} | Status: ${p.status}`,
+  subOf: (p) => `${p.nama_pasien || `Pasien #${p.pasien_id}`} | ${p.nama_poli || `Jadwal #${p.jadwal_id}`} | Status: ${p.status}`,
   // Tombol ubah status (alur: menunggu -> dipanggil -> selesai / batal)
   actions: (item, { reload }) =>
     ['dipanggil', 'selesai', 'batal']
@@ -84,7 +116,7 @@ export const PendaftaranForm = makeFormScreen({
   api: pendaftaranApi,
   fields: [
     { name: 'pasien_id', label: 'Pasien', type: 'select', required: true, loadOptions: pasienOptions },
-    { name: 'jadwal_id', label: 'ID Jadwal Praktik', type: 'number', required: true, validate: [positiveInt('ID Jadwal')] },
+    { name: 'jadwal_id', label: 'Jadwal Praktik', type: 'select', required: true, loadOptions: jadwalOptions },
     { name: 'tanggal_kunjungan', label: 'Tanggal Kunjungan', type: 'date', required: true, validate: [isDate('Tanggal kunjungan')] },
     { name: 'no_antrian', label: 'No. Antrian', type: 'number', required: true, validate: [positiveInt('No. antrian')] },
     {
@@ -153,4 +185,3 @@ export const UsersForm = makeFormScreen({
     },
   ],
 });
-

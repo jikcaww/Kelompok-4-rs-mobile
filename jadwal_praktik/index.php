@@ -30,6 +30,9 @@ if ($id) {
     a.dokter_id,
     a.poli_id,
     a.hari,
+    a.jam_mulai,
+    a.jam_selesai,
+    a.kuota,
     b.nama_poli,
     c.nama as nama_dokter
     FROM jadwal_praktik a

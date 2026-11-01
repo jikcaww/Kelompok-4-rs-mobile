@@ -12,6 +12,8 @@ $id         = $_GET['id'] ?? null;
 $dokter_id  = $_GET['dokter_id'] ?? null;
 $poli_id    = $_GET['poli_id'] ?? null;
 $hari       = $_GET['hari'] ?? null;
+$jam_mulai  = $_GET['jam_mulai'] ?? null;
+$jam_selesai = $_GET['jam_selesai'] ?? null;
 $kuota      = $_GET['kuota'] ?? null;
 
 if (empty($id) || empty($dokter_id)) {
@@ -26,13 +28,15 @@ if (!$cek->fetch()) {
 }
 
 
-$stmt   = $pdo->prepare("UPDATE jadwal_praktik SET dokter_id=?,poli_id=?,hari=?,kuota=? WHERE id=?");
-$stmt->execute([$dokter_id, $poli_id, $hari, $kuota, $id]);
+$stmt   = $pdo->prepare("UPDATE jadwal_praktik SET dokter_id=?,poli_id=?,hari=?,jam_mulai=?,jam_selesai=?,kuota=? WHERE id=?");
+$stmt->execute([$dokter_id, $poli_id, $hari, $jam_mulai, $jam_selesai, $kuota, $id]);
 
 sendResponse('success', 'Data Jadwal Praktik Berhasil diperbarui', [
     'id'        => $id,
     'dokter_id' => $dokter_id,
     'poli_id'   => $poli_id,
     'hari'      => $hari,
+    'jam_mulai' => $jam_mulai,
+    'jam_selesai' => $jam_selesai,
     'kuota'     => $kuota
 ], 201);

@@ -21,9 +21,19 @@ if (!$cek->fetch()) {
     sendResponse('error', 'Data poli tidak ditemukan', null, 404);
 }
 
+$ref = $pdo->prepare("SELECT COUNT(*) AS jumlah FROM jadwal_praktik WHERE poli_id = ?");
+$ref->execute([$id]);
+$dependensi = (int)$ref->fetchColumn();
+if ($dependensi > 0) {
+    sendResponse('error', "Poli tidak dapat dihapus karena masih digunakan oleh {$dependensi} jadwal praktik", null, 409);
+}
 
-$stmt   = $pdo->prepare("DELETE FROM poli WHERE id=?");
-$stmt->execute([$id]);
+try {
+    $stmt   = $pdo->prepare("DELETE FROM poli WHERE id=?");
+    $stmt->execute([$id]);
+} catch (PDOException $e) {
+    sendResponse('error', 'Poli tidak dapat dihapus karena masih digunakan data lain', null, 409);
+}
 
 sendResponse('success', 'Data Poli Berhasil dihapus', [
     'id'        => $id

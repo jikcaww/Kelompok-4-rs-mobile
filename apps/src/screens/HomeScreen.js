@@ -4,6 +4,7 @@ import { ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 const MENU = [
   { label: 'Data Poli', route: 'PoliList' },
   { label: 'Data Dokter', route: 'DokterList' },
+  { label: 'Data Jadwal Praktik', route: 'JadwalPraktikList' },
   { label: 'Data Pasien', route: 'PasienList' },
   { label: 'Pendaftaran Antrian', route: 'PendaftaranList' },
   { label: 'Rekam Medis (dan Resep)', route: 'RekamMedisList' },

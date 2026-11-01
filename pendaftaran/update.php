@@ -15,8 +15,12 @@ $tanggal_kunjungan  = $_GET['tanggal_kunjungan'] ?? null;
 $no_antrian  = $_GET['no_antrian'] ?? null;
 $status  = $_GET['status'] ?? null;
 
-if (empty($id) || empty($pasien_id)) {
-    sendResponse('error', 'Id dan Nama pasien wajib diisi', null, 400);
+if (empty($id) || empty($pasien_id) || empty($jadwal_id)) {
+    sendResponse('error', 'ID pendaftaran, pasien, dan jadwal wajib diisi', null, 400);
+}
+
+if (!in_array($status, ['menunggu', 'dipanggil', 'selesai', 'batal'], true)) {
+    sendResponse('error', 'Status pendaftaran tidak valid', null, 400);
 }
 
 $pdo    = getConnection();
@@ -27,11 +31,14 @@ if (!$cek->fetch()) {
 }
 
 
-$stmt   = $pdo->prepare("UPDATE pendaftaran  SET pasien_id=?,jadwal_id=?,tanggal_kunjungan=?,no_antrian=?,status=? WHERE id=?");
-$stmt->execute([$pasien_id, $jadwal_id, $tanggal_kunjungan, $no_antrian, $id]);
+$stmt   = $pdo->prepare("UPDATE pendaftaran SET pasien_id=?, jadwal_id=?, tanggal_kunjungan=?, no_antrian=?, status=? WHERE id=?");
+$stmt->execute([$pasien_id, $jadwal_id, $tanggal_kunjungan, $no_antrian, $status, $id]);
 
 sendResponse('success', 'Data Pendaftaran Berhasil diperbaruii', [
     'id'        => $id,
     'pasien_id' => $pasien_id,
-    'tanggal_kunjungan'    => $tanggal_kunjungan
+    'jadwal_id' => $jadwal_id,
+    'tanggal_kunjungan' => $tanggal_kunjungan,
+    'no_antrian' => $no_antrian,
+    'status' => $status,
 ], 201);

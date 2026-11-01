@@ -45,5 +45,5 @@ try {
         'no_sip'        => $no_sip
     ], 201);
 } catch (PDOException $e) {
-    sendResponse('error', 'Gagal menyimpan data', null, 500);
+    sendResponse('error', 'Gagal menyimpan dokter: ' . $e->getMessage(), null, 500);
 }

@@ -31,9 +31,21 @@ $lokasi    = trim($input['lokasi'] ?? '');
 if ($nama_poli === '') {
     sendResponse('error', 'Nama poli wajib diisi', null, 400);
 }
+if (mb_strlen($nama_poli, 'UTF-8') > 100) {
+    sendResponse('error', 'Nama poli maksimal 100 karakter', null, 400);
+}
+if (mb_strlen($lokasi, 'UTF-8') > 150) {
+    sendResponse('error', 'Lokasi maksimal 150 karakter', null, 400);
+}
 
 try {
     $pdo  = getConnection();
+    $cek = $pdo->prepare("SELECT id FROM poli WHERE LOWER(TRIM(nama_poli)) = LOWER(TRIM(?)) LIMIT 1");
+    $cek->execute([$nama_poli]);
+    if ($cek->fetch()) {
+        sendResponse('error', 'Nama poli sudah digunakan', null, 409);
+    }
+
     $stmt = $pdo->prepare("INSERT INTO poli (nama_poli, lokasi) VALUES (?, ?)");
     $stmt->execute([$nama_poli, $lokasi]);
 

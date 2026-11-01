@@ -33,12 +33,27 @@ $tgl_lahir = trim($input['tgl_lahir'] ?? '');
 $jenis_kelamin = trim($input['jenis_kelamin'] ?? '');
 $alamat = trim($input['alamat'] ?? '');
 
+if (!ctype_digit($user_id) || (int)$user_id <= 0) {
+    sendResponse('error', 'ID User wajib berupa angka dan harus memilih akun yang valid', null, 400);
+}
+
+if ($nik === '' || $nama === '' || $tgl_lahir === '' || $jenis_kelamin === '') {
+    sendResponse('error', 'NIK, nama, tanggal lahir, dan jenis kelamin wajib diisi', null, 400);
+}
+
 if ($no_rm === '') {
     sendResponse('error', 'Nomor RM wajib diisi', null, 400);
 }
 
 try {
     $pdo  = getConnection();
+
+    $userStmt = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+    $userStmt->execute([$user_id]);
+    if (!$userStmt->fetchColumn()) {
+        sendResponse('error', 'ID User tidak ditemukan. Buat akun pada menu Users terlebih dahulu.', null, 400);
+    }
+
     $stmt = $pdo->prepare("INSERT INTO pasien (user_id, nik, no_rm, nama, tgl_lahir, jenis_kelamin, alamat) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$user_id, $nik, $no_rm, $nama, $tgl_lahir, $jenis_kelamin, $alamat]);
 
@@ -48,5 +63,9 @@ try {
         'nama'      => $nama
     ], 201);
 } catch (PDOException $e) {
-    sendResponse('error', 'Gagal menyimpan data' . $e->getMessage(), null, 500);
+    $message = $e->getCode() === '23000'
+        ? 'Data pasien tidak dapat disimpan karena User sudah dipakai, NIK/No. RM sudah terdaftar, atau data pengguna tidak valid.'
+        : 'Gagal menyimpan data pasien: ' . $e->getMessage();
+
+    sendResponse('error', $message, null, 500);
 }
