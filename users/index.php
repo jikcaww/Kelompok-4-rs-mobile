@@ -7,8 +7,7 @@ $id     = $_GET['id'] ?? null;
 $pdo    = getConnection();
 
 if ($id) {
-    //$stmt   = $pdo->prepare("SELECT * FROM poli WHERE id = ?");
-    $stmt   = $pdo->prepare("SELECT * FROM users WHERE nama LIKE ?");
+    $stmt = $pdo->prepare("SELECT id, nama, email, role FROM users WHERE id = ?");
     $stmt->execute([$id]);
     $data   = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -17,7 +16,7 @@ if ($id) {
     }
     sendResponse('success', 'Data users ditemukan', $data);
 } else {
-    $stmt   = $pdo->query("SELECT * FROM users ORDER BY nama ASC");
+    $stmt = $pdo->query("SELECT id, nama, email, role FROM users ORDER BY nama ASC");
     $data   = $stmt->fetchAll(PDO::FETCH_ASSOC);
     sendResponse('success', 'Daftar users berhasil diambil', $data);
 }

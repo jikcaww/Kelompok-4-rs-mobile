@@ -29,22 +29,30 @@ $pendaftaran_id = trim($input['pendaftaran_id'] ?? '');
 $dokter_id    = trim($input['dokter_id'] ?? '');
 $diagnosa   =  trim($input['diagnosa'] ?? '');
 $catatan   =  trim($input['catatan'] ?? '');
-$tanggal   =  trim($input['tanggal'] ?? '');
 
-if ($diagnosa === '') {
-    sendResponse('error', 'Diagnosa wajib diisi', null, 400);
+if ($pendaftaran_id === '' || $dokter_id === '' || $diagnosa === '') {
+    sendResponse('error', 'Pendaftaran, dokter, dan diagnosa wajib diisi', null, 400);
+}
+
+if (!ctype_digit($pendaftaran_id) || !ctype_digit($dokter_id)) {
+    sendResponse('error', 'Pendaftaran atau dokter tidak valid', null, 400);
 }
 
 try {
     $pdo  = getConnection();
-    $stmt = $pdo->prepare("INSERT INTO diagnosa (pendaftaran_id, dokter_id,diagnosa,catatan,tanggal) VALUES (?, ?,?,?,?)");
-    $stmt->execute([$pendaftaran_id, $dokter_id, $diagnosa, $catatan, $tanggal]);
+    $stmt = $pdo->prepare(
+        "INSERT INTO rekam_medis (pendaftaran_id, dokter_id, diagnosa, catatan, tanggal)
+         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)"
+    );
+    $stmt->execute([$pendaftaran_id, $dokter_id, $diagnosa, $catatan]);
 
     sendResponse('success', 'Data rekam medis Berhasil Ditambahkan', [
         'id'        => $pdo->lastInsertId(),
         'diagnosa' => $diagnosa,
-        'tanggal'    => $tanggal
     ], 201);
 } catch (PDOException $e) {
-    sendResponse('error', 'Gagal menyimpan data', null, 500);
+    $message = $e->getCode() === '23000'
+        ? 'Pendaftaran atau dokter tidak ditemukan, atau rekam medis untuk pendaftaran ini sudah ada.'
+        : 'Gagal menyimpan data rekam medis: ' . $e->getMessage();
+    sendResponse('error', $message, null, 500);
 }
