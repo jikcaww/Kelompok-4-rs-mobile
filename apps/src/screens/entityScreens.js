@@ -174,7 +174,7 @@ export const UsersForm = makeFormScreen({
   fields: [
     { name: 'nama', label: 'Nama Lengkap', required: true, maxLength: 100 },
     { name: 'email', label: 'E-mail', type: 'email', required: true },
-    { name: 'password', label: 'Password', type: 'password', required: true },
+    { name: 'password', label: 'Password', type: 'password', required: true, requiredOnCreate: true },
     {
       name: 'role', label: 'Role', type: 'select', default: 'pasien',
       options: [

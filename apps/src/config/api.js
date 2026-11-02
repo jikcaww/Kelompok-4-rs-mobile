@@ -6,7 +6,7 @@ import Constants from 'expo-constants';
 // ============================================================
 
 // Nama folder API di htdocs XAMPP  ->  http://<host>/<API_FOLDER>/poli/index.php
-const API_FOLDER = 'api-simrs';
+const API_FOLDER = 'Kelompok-4-rs-mobile';
 
 // Port Apache. Kosongkan ('') bila memakai port 80 bawaan XAMPP.
 const API_PORT = '';

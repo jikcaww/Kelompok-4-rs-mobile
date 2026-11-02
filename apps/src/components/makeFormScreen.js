@@ -47,8 +47,9 @@ export default function makeFormScreen({ api, fields }) {
       fields.forEach((f) => {
         if (f.type === 'hidden') return;
         const val = values[f.name].trim();
-        if (val === '' && !f.required) return;
-        const rules = [...(f.required ? [required(f.label)] : []), ...(f.validate || [])];
+        const requiredField = f.required && (!f.requiredOnCreate || !isEdit);
+        if (val === '' && !requiredField) return;
+        const rules = [...(requiredField ? [required(f.label)] : []), ...(f.validate || [])];
         for (const rule of rules) {
           const msg = rule(val);
           if (msg) { err[f.name] = msg; break; }
@@ -79,7 +80,7 @@ export default function makeFormScreen({ api, fields }) {
       const opts = (Array.isArray(rawOpts) ? rawOpts : []).map(normalizeOption);
       return (
         <View key={f.name}>
-          <Text style={s.label}>{f.label}{f.required ? ' *' : ''}</Text>
+          <Text style={s.label}>{f.label}{f.required && (!f.requiredOnCreate || !isEdit) ? ' *' : ''}</Text>
           {f.type === 'select' ? (
             <View style={s.chipRow}>
               {opts.length === 0 && <Text style={s.hint}>Pilihan kosong / sedang dimuat...</Text>}
