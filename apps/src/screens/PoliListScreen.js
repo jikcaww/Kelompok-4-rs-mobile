@@ -58,7 +58,7 @@ export default function PoliListScreen({ navigation }) {
       </View>
       <TouchableOpacity
         style={[s.btn, { backgroundColor: '#f59e0b' }]}
-        onPress={() => navigation.navigate('PoliForm', { poli: item })}>
+        onPress={() => navigation.navigate('PoliForm', { item })}>
         <Text style={s.btnText}>Edit</Text>
       </TouchableOpacity>
       <TouchableOpacity

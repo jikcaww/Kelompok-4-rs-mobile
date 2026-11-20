@@ -6,7 +6,7 @@ import { createPoli, updatePoli } from '../services/poliService';
 import { showAlert } from '../utils/dialog';
 
 export default function PoliFormScreen({ route, navigation }) {
-  const poli = route.params?.poli;      // undefined = mode tambah
+  const poli = route.params?.item;      // undefined = mode tambah
   const isEdit = !!poli;
 
   const [namaPoli, setNamaPoli] = useState(poli?.nama_poli ?? '');
