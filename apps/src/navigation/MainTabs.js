@@ -1,26 +1,22 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { PendaftaranList } from '../screens/entityScreens';
 import HomeScreen from '../screens/HomeScreen';
+import { PendaftaranList } from '../screens/entityScreens';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
-const icon = (glyph) => ({ focused }) => (
-  <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>{glyph}</Text>
-);
-
 export default function MainTabs() {
   return (
-    <Tab.Navigator screenOptions={{ tabBarActiveTintColor: '#2563eb' }}>
+    <Tab.Navigator>
       <Tab.Screen
         name="Beranda"
         component={HomeScreen}
         options={{
-          title: 'SIMRS',
+          title: 'Beranda',
           tabBarLabel: 'Beranda',
-          tabBarIcon: icon('🏠'),
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>🏠</Text>,
         }}
       />
       <Tab.Screen
@@ -29,7 +25,7 @@ export default function MainTabs() {
         options={{
           title: 'Antrian',
           tabBarLabel: 'Antrian',
-          tabBarIcon: icon('📋'),
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>📋</Text>,
         }}
       />
       <Tab.Screen
@@ -38,7 +34,7 @@ export default function MainTabs() {
         options={{
           title: 'Akun',
           tabBarLabel: 'Akun',
-          tabBarIcon: icon('👤'),
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>👤</Text>,
         }}
       />
     </Tab.Navigator>
